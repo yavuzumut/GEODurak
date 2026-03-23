@@ -7,6 +7,7 @@ import { Station } from '../stations/station.entity';
 import { GPSLocationService } from './gps-location.service';
 import { MockLocationService } from './mock-location.service';
 import { DevController } from './dev.controller';
+import { RedisModule } from '../redis/redis.module';
 
 const LocationServiceProvider = {
   provide: 'ILocationService',
@@ -19,7 +20,7 @@ const LocationServiceProvider = {
 };
 
 @Module({
-  imports: [DriversModule, TypeOrmModule.forFeature([Driver, Station])],
+  imports: [DriversModule, TypeOrmModule.forFeature([Driver, Station]), RedisModule],
   controllers: [DevController],
   providers: [GeofenceService, GPSLocationService, MockLocationService, LocationServiceProvider],
   exports: [GeofenceService, LocationServiceProvider],
