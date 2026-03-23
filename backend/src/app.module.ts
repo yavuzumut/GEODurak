@@ -25,6 +25,7 @@ import { RedisModule } from './redis/redis.module';
       synchronize: true, // DEV ONLY
     }),
     ScheduleModule.forRoot(),
+    RedisModule,
     DriversModule,
     StationsModule,
     TripsModule,
