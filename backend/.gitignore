@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Build output
+/dist
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+jspm_packages/
+
+# Coverage reports
+coverage/
+
+# IDE configuration
+.idea/
+.vscode/
+
+# Other common exclusions
+.DS_Store
+Thumbs.db
