@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+    db:
+        image: postgis/postgis:15-3.3
+        container_name: geodurak_db_container
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: umut
+            POSTGRES_PASSWORD: durak123
+            POSTGRES_DB: geodurak_db
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+volumes:
+    postgres_data:
