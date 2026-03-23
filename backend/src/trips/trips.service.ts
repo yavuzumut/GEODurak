@@ -57,6 +57,11 @@ export class TripsService {
     return this.tripsRepo.findOne({ where: { id: tripId } });
   }
 
+  async remove(id: string): Promise<{ deleted: boolean }> {
+    await this.tripsRepo.delete(id);
+    return { deleted: true };
+  }
+
   async getTodayTrips(): Promise<Trip[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

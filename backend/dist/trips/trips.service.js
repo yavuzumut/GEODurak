@@ -63,6 +63,10 @@ let TripsService = class TripsService {
         });
         return this.tripsRepo.findOne({ where: { id: tripId } });
     }
+    async remove(id) {
+        await this.tripsRepo.delete(id);
+        return { deleted: true };
+    }
     async getTodayTrips() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);

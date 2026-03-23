@@ -268,6 +268,42 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     }
   }
 
+  @SubscribeMessage('admin:cancelTrip')
+  async handleAdminCancelTrip(
+    @MessageBody() data: { tripId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const trip = await this.tripsService.cancelTrip(data.tripId);
+    if (trip) {
+      if (trip.driverId) {
+        const driverSocketId = this.driverSockets.get(trip.driverId);
+        if (driverSocketId) {
+          this.server.to(driverSocketId).emit('tripCancelled', { tripId: trip.id });
+        }
+      }
+      this.server.emit('tripStatusUpdate', { tripId: trip.id, status: trip.status });
+      this.broadcastState();
+      client.emit('admin:tripCancelled', { success: true });
+    }
+  }
+
+  @SubscribeMessage('admin:forceOffline')
+  async handleAdminForceOffline(
+    @MessageBody() data: { driverId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const driver = await this.driversService.updateStatus(data.driverId, DriverStatus.OFFLINE);
+    if (driver) {
+      this.removeFromQueue(data.driverId);
+      const driverSocketId = this.driverSockets.get(data.driverId);
+      if (driverSocketId) {
+        this.server.to(driverSocketId).emit('admin:kicked', { message: 'Yönetici tarafından çevrimdışı yapıldınız.' });
+      }
+      this.broadcastState();
+      client.emit('admin:forcedOffline', { success: true });
+    }
+  }
+
   // --- Helpers ---
   private removeFromQueue(driverId: string) {
     this.queue = this.queue.filter((id) => id !== driverId);

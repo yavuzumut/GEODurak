@@ -19,23 +19,33 @@ const trips_module_1 = require("./trips/trips.module");
 const geofence_module_1 = require("./geofence/geofence.module");
 const admin_module_1 = require("./admin/admin.module");
 const auth_module_1 = require("./auth/auth.module");
+const redis_module_1 = require("./redis/redis.module");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: 'localhost',
-                port: 5432,
-                username: 'umut',
-                password: 'durak123',
-                database: 'geodurak_db',
-                entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                synchronize: true,
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (configService) => ({
+                    type: 'postgres',
+                    host: configService.get('DB_HOST', 'localhost'),
+                    port: configService.get('DB_PORT', 5432),
+                    username: configService.get('DB_USER', 'umut'),
+                    password: configService.get('DB_PASS', 'durak123'),
+                    database: configService.get('DB_NAME', 'geodurak_db'),
+                    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                    synchronize: configService.get('DB_SYNC', true),
+                }),
+                inject: [config_1.ConfigService],
             }),
             schedule_1.ScheduleModule.forRoot(),
+            redis_module_1.RedisModule,
             drivers_module_1.DriversModule,
             stations_module_1.StationsModule,
             trips_module_1.TripsModule,

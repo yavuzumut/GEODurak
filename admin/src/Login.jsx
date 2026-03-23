@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
-const API = 'http://192.168.1.10:3000';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Login({ onLogin }) {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPass, setShowPass] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -56,7 +57,7 @@ export default function Login({ onLogin }) {
             <label>Telefon Numarası</label>
             <input 
               type="text" 
-              placeholder="05XX XXX XX XX" 
+              placeholder="05001234567" 
               value={phone} 
               onChange={e => setPhone(e.target.value)}
               disabled={loading}
@@ -66,13 +67,17 @@ export default function Login({ onLogin }) {
 
           <div className="form-group" style={{ marginBottom: '32px' }}>
             <label>Şifre</label>
-            <input 
-              type="password" 
-              placeholder="••••••••" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)}
-              disabled={loading}
-            />
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showPass ? 'text' : 'password'} 
+                placeholder="admin123" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)}
+                disabled={loading}
+                style={{ paddingRight: '60px' }}
+              />
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', color:'var(--text-secondary)', cursor:'pointer', fontSize:13 }}>{showPass ? 'Gizle' : 'Göster'}</button>
+            </div>
           </div>
 
           <button 

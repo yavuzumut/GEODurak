@@ -62,6 +62,12 @@ export declare class QueueGateway implements OnGatewayConnection, OnGatewayDisco
         tripId: string;
         driverId: string;
     }, client: Socket): Promise<void>;
+    handleAdminCancelTrip(data: {
+        tripId: string;
+    }, client: Socket): Promise<void>;
+    handleAdminForceOffline(data: {
+        driverId: string;
+    }, client: Socket): Promise<void>;
     private removeFromQueue;
     private assignTripToNextDriver;
     private broadcastState;

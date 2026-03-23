@@ -11,5 +11,8 @@ export declare class DriversService {
     updateStatus(driverId: string, status: DriverStatus): Promise<Driver | null>;
     clearGeofenceExitTimer(driverId: string): Promise<void>;
     getDriversOutsideGeofenceTooLong(timeoutMs: number): Promise<Driver[]>;
+    remove(id: string): Promise<{
+        deleted: boolean;
+    }>;
     getAllWithCoordinates(): Promise<any[]>;
 }

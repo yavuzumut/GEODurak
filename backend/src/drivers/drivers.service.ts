@@ -93,6 +93,11 @@ export class DriversService {
       .getMany();
   }
 
+  async remove(id: string): Promise<{ deleted: boolean }> {
+    await this.driversRepository.delete(id);
+    return { deleted: true };
+  }
+
   async getAllWithCoordinates(): Promise<any[]> {
     return this.driversRepository.query(`
       SELECT 

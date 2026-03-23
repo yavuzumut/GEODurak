@@ -70,7 +70,16 @@ export class AdminController {
 
   @Delete('drivers/:id/queue')
   async removeDriverFromQueue(@Param('id') id: string) {
-    // This is handled via WebSocket, but we can also provide a REST fallback
     return { message: 'Use WebSocket admin:removeFromQueue event for real-time queue management' };
+  }
+
+  @Delete('drivers/:id')
+  async deleteDriver(@Param('id') id: string) {
+    return this.driversService.remove(id);
+  }
+
+  @Delete('trips/:id')
+  async deleteTrip(@Param('id') id: string) {
+    return this.tripsService.remove(id);
   }
 }

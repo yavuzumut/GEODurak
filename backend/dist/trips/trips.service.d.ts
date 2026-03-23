@@ -12,6 +12,9 @@ export declare class TripsService {
     acceptTrip(tripId: string): Promise<Trip | null>;
     completeTrip(tripId: string): Promise<Trip | null>;
     cancelTrip(tripId: string): Promise<Trip | null>;
+    remove(id: string): Promise<{
+        deleted: boolean;
+    }>;
     getTodayTrips(): Promise<Trip[]>;
     getHourlyStats(): Promise<any[]>;
 }

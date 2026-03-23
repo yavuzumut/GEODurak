@@ -204,6 +204,32 @@ let QueueGateway = class QueueGateway {
             client.emit('admin:assigned', trip);
         }
     }
+    async handleAdminCancelTrip(data, client) {
+        const trip = await this.tripsService.cancelTrip(data.tripId);
+        if (trip) {
+            if (trip.driverId) {
+                const driverSocketId = this.driverSockets.get(trip.driverId);
+                if (driverSocketId) {
+                    this.server.to(driverSocketId).emit('tripCancelled', { tripId: trip.id });
+                }
+            }
+            this.server.emit('tripStatusUpdate', { tripId: trip.id, status: trip.status });
+            this.broadcastState();
+            client.emit('admin:tripCancelled', { success: true });
+        }
+    }
+    async handleAdminForceOffline(data, client) {
+        const driver = await this.driversService.updateStatus(data.driverId, driver_entity_1.DriverStatus.OFFLINE);
+        if (driver) {
+            this.removeFromQueue(data.driverId);
+            const driverSocketId = this.driverSockets.get(data.driverId);
+            if (driverSocketId) {
+                this.server.to(driverSocketId).emit('admin:kicked', { message: 'Yönetici tarafından çevrimdışı yapıldınız.' });
+            }
+            this.broadcastState();
+            client.emit('admin:forcedOffline', { success: true });
+        }
+    }
     removeFromQueue(driverId) {
         this.queue = this.queue.filter((id) => id !== driverId);
     }
@@ -349,6 +375,22 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], QueueGateway.prototype, "handleManualAssign", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('admin:cancelTrip'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], QueueGateway.prototype, "handleAdminCancelTrip", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('admin:forceOffline'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], QueueGateway.prototype, "handleAdminForceOffline", null);
 exports.QueueGateway = QueueGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: true }),
     __metadata("design:paramtypes", [drivers_service_1.DriversService,

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisModule = void 0;
 const common_1 = require("@nestjs/common");
 const ioredis_1 = __importDefault(require("ioredis"));
+const config_1 = require("@nestjs/config");
 let RedisModule = class RedisModule {
 };
 exports.RedisModule = RedisModule;
@@ -21,12 +22,13 @@ exports.RedisModule = RedisModule = __decorate([
         providers: [
             {
                 provide: 'REDIS_CLIENT',
-                useFactory: () => {
+                useFactory: (configService) => {
                     return new ioredis_1.default({
-                        host: 'localhost',
-                        port: 6379,
+                        host: configService.get('REDIS_HOST', 'localhost'),
+                        port: configService.get('REDIS_PORT', 6379),
                     });
                 },
+                inject: [config_1.ConfigService],
             },
         ],
         exports: ['REDIS_CLIENT'],

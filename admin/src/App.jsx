@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import Login from './Login';
 import './index.css';
 
-const API = 'http://192.168.1.10:3000';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -77,7 +77,17 @@ function App() {
 
     s.on('admin:tripCreated', () => {
       fetchTrips();
+      fetchHourlyStats();
       setTripModal(false);
+    });
+
+    s.on('admin:tripCancelled', () => {
+      fetchTrips();
+      fetchHourlyStats();
+    });
+
+    s.on('admin:forcedOffline', () => {
+      s.emit('getState');
     });
 
     // Initial fetch
@@ -136,6 +146,38 @@ function App() {
     socket?.emit('admin:manualAssign', { tripId, driverId });
   };
 
+  const cancelTrip = (tripId) => {
+    if (window.confirm('Bu yolculuğu iptal etmek istediğinize emin misiniz?')) {
+      socket?.emit('admin:cancelTrip', { tripId });
+    }
+  };
+
+  const forceOffline = (driverId) => {
+    if (window.confirm('Bu sürücüyü çevrimdışı yapmak istediğinize emin misiniz?')) {
+      socket?.emit('admin:forceOffline', { driverId });
+    }
+  };
+
+  const deleteDriver = async (driverId) => {
+    if (window.confirm('Bu sürücüyü sistemden kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+      await fetch(`${API}/admin/drivers/${driverId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      socket?.emit('getState');
+    }
+  };
+
+  const deleteTrip = async (tripId) => {
+    if (window.confirm('Bu yolculuğu sistemden kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+      await fetch(`${API}/admin/trips/${tripId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      fetchTrips();
+    }
+  };
+
   const availableCount = drivers.filter(d => d.status === 'available').length;
   const busyCount = drivers.filter(d => d.status === 'busy').length;
   const offlineCount = drivers.filter(d => d.status === 'offline').length;
@@ -167,7 +209,7 @@ function App() {
         </div>
         <table>
           <thead>
-            <tr><th>Ad</th><th>Plaka</th><th>Durum</th><th>Sırada</th><th>Konum</th></tr>
+            <tr><th>Ad</th><th>Plaka</th><th>Durum</th><th>Sırada</th><th>Konum</th><th>İşlem</th></tr>
           </thead>
           <tbody>
             {drivers.map(d => (
@@ -177,9 +219,15 @@ function App() {
                 <td><span className={`badge ${d.status}`}>{d.status === 'available' ? 'Müsait' : d.status === 'busy' ? 'Meşgul' : 'Çevrimdışı'}</span></td>
                 <td>{queue.includes(d.id) ? <span className="badge in-queue">#{queue.indexOf(d.id) + 1}</span> : '-'}</td>
                 <td style={{fontSize:12, color:'#888'}}>{d.latitude?.toFixed(4)}, {d.longitude?.toFixed(4)}</td>
+                <td style={{display:'flex', gap:4, flexWrap:'wrap'}}>
+                  {d.status !== 'offline' && (
+                    <button className="btn btn-danger btn-sm" onClick={() => forceOffline(d.id)}>Çıkar</button>
+                  )}
+                  <button className="btn btn-danger btn-sm" style={{opacity:0.75}} onClick={() => deleteDriver(d.id)}>Sil</button>
+                </td>
               </tr>
             ))}
-            {drivers.length === 0 && <tr><td colSpan="5" style={{textAlign:'center', padding:30, color:'#888'}}>Henüz sürücü yok</td></tr>}
+            {drivers.length === 0 && <tr><td colSpan="6" style={{textAlign:'center', padding:30, color:'#888'}}>Henüz sürücü yok</td></tr>}
           </tbody>
         </table>
       </div>
@@ -239,10 +287,14 @@ function App() {
                   <td><span className={`badge ${t.status}`}>{t.status}</span></td>
                   <td>{d?.name || (t.driverId ? t.driverId.slice(0,8) + '...' : '-')}</td>
                   <td style={{fontSize:12}}>{new Date(t.createdAt).toLocaleTimeString('tr-TR')}</td>
-                  <td>
+                  <td style={{display:'flex', gap:4, flexWrap:'wrap'}}>
                     {t.status === 'pending' && queue.length > 0 && (
                       <button className="btn btn-warning btn-sm" onClick={() => manualAssign(t.id, queue[0])}>Ata</button>
                     )}
+                    {t.status !== 'completed' && t.status !== 'cancelled' && (
+                      <button className="btn btn-danger btn-sm" onClick={() => cancelTrip(t.id)}>İptal</button>
+                    )}
+                    <button className="btn btn-danger btn-sm" style={{opacity:0.75}} onClick={() => deleteTrip(t.id)}>Sil</button>
                   </td>
                 </tr>
               );

@@ -1,4 +1,5 @@
-# Logs
+git add .
+git commit -m "Mobile ve Backend klasörleri tek bir çatıda birleşti"# Logs
 logs
 *.log
 npm-debug.log*

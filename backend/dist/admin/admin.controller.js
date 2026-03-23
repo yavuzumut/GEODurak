@@ -68,6 +68,12 @@ let AdminController = class AdminController {
     async removeDriverFromQueue(id) {
         return { message: 'Use WebSocket admin:removeFromQueue event for real-time queue management' };
     }
+    async deleteDriver(id) {
+        return this.driversService.remove(id);
+    }
+    async deleteTrip(id) {
+        return this.tripsService.remove(id);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -127,6 +133,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "removeDriverFromQueue", null);
+__decorate([
+    (0, common_1.Delete)('drivers/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteDriver", null);
+__decorate([
+    (0, common_1.Delete)('trips/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteTrip", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admin'),
     __metadata("design:paramtypes", [drivers_service_1.DriversService,

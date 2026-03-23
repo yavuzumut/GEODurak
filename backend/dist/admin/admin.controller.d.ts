@@ -27,4 +27,10 @@ export declare class AdminController {
     removeDriverFromQueue(id: string): Promise<{
         message: string;
     }>;
+    deleteDriver(id: string): Promise<{
+        deleted: boolean;
+    }>;
+    deleteTrip(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }

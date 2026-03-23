@@ -87,6 +87,10 @@ let DriversService = class DriversService {
             .andWhere('driver.status != :offline', { offline: driver_entity_1.DriverStatus.OFFLINE })
             .getMany();
     }
+    async remove(id) {
+        await this.driversRepository.delete(id);
+        return { deleted: true };
+    }
     async getAllWithCoordinates() {
         return this.driversRepository.query(`
       SELECT 

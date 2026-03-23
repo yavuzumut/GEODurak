@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: geodurak_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-umut}
+      POSTGRES_PASSWORD: ${DB_PASS:-durak123}
+      POSTGRES_DB: ${DB_NAME:-geodurak_db}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - geodurak_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: geodurak_redis_prod
+    restart: always
+    networks:
+      - geodurak_network
+
+  backend:
+    build: ./backend
+    container_name: geodurak_backend_prod
+    restart: always
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-umut}
+      - DB_PASS=${DB_PASS:-durak123}
+      - DB_NAME=${DB_NAME:-geodurak_db}
+      - DB_SYNC=false
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-super-secret-key}
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    networks:
+      - geodurak_network
+
+networks:
+  geodurak_network:
+    driver: bridge
+
+volumes:
+  postgres_data_prod:

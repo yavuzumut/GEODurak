@@ -5,8 +5,7 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import DriverScreen from './screens/DriverScreen';
 import AdminScreen from './screens/AdminScreen';
-
-const API_URL = 'http://192.168.1.10:3000';
+import API_URL from './config';
 
 export default function App() {
   const [user, setUser] = useState(null); // { role, accessToken }

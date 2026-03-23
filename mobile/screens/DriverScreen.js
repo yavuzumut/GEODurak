@@ -4,8 +4,8 @@ import * as Location from 'expo-location';
 import { io } from 'socket.io-client';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URL from '../config';
 
-const API_URL = 'http://192.168.1.10:3000';
 const TEST_UUID = '22222222-2222-2222-2222-222222222222'; // The true mock driver ID for test
 const STATION_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 
@@ -102,6 +102,21 @@ export default function DriverScreen({ onLogout, token, userId }) {
     newSocket.on('leftQueue', () => {
       setQueuePosition(null);
       addNotification('📋 Sıradan ayrıldınız.');
+    });
+
+    newSocket.on('admin:kicked', (data) => {
+      Alert.alert('Çevrimedışı Yapıldı', data.message || 'Yönetici tarafından çevrimedışı yapıldınız.');
+      setDriverStatus('offline');
+      setQueuePosition(null);
+      addNotification('⛔ ' + (data.message || 'Çevrimedışı yapıldınız'));
+    });
+
+    newSocket.on('tripCancelled', (data) => {
+      setActiveTrip(null);
+      setTripModal(false);
+      setPendingTrip(null);
+      addNotification('❌ Yolculuk iptal edildi.');
+      Alert.alert('Yolculuk İptal', 'Yolculuk yönetici tarafından iptal edildi.');
     });
 
     newSocket.on('error', (data) => Alert.alert('Hata', data.message));

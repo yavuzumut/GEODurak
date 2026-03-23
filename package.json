@@ -1,0 +1,17 @@
+{
+  "name": "geodurak",
+  "version": "1.0.0",
+  "description": "GeoDurak - Akıllı Taksi Durağı Yönetim Sistemi",
+  "scripts": {
+    "start": "concurrently --kill-others-on-fail --names \"BACKEND,ADMIN,MOBILE\" --prefix-colors \"blue,green,yellow\" \"npm run start:backend\" \"npm run start:admin\" \"npm run start:mobile\"",
+    "start:backend": "cd backend && npm run start:dev",
+    "start:admin": "npm run dev --prefix admin",
+    "start:mobile": "npm start --prefix mobile",
+    "install:all": "npm install --prefix backend && npm install --prefix admin && npm install --prefix mobile",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
