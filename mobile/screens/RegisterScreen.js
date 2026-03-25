@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from 'react-native';
+import API_URL from '../config';
+
 
 export default function RegisterScreen({ onLogin, onBackToLogin }) {
   const [name, setName] = useState('');
@@ -13,7 +15,7 @@ export default function RegisterScreen({ onLogin, onBackToLogin }) {
   const [stationsLoading, setStationsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://192.168.1.10:3000/stations')
+    fetch(`${API_URL}/stations`)
       .then(res => res.json())
       .then(data => {
         setStations(data);
@@ -35,7 +37,7 @@ export default function RegisterScreen({ onLogin, onBackToLogin }) {
 
     setLoading(true);
     try {
-      const res = await fetch('http://192.168.1.10:3000/auth/register', {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, password, licensePlate, stationId: selectedStationId }),

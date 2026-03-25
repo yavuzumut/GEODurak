@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import API_URL from '../config';
+
 
 export default function LoginScreen({ onLogin, onRegister }) {
   const [role, setRole] = useState('driver'); // 'driver' | 'admin'
@@ -16,7 +18,7 @@ export default function LoginScreen({ onLogin, onRegister }) {
 
     setLoading(true);
     try {
-      const res = await fetch('http://192.168.1.10:3000/auth/login', {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password }),
