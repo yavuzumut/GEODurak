@@ -16,7 +16,7 @@ npm start              # Her şeyi başlatır
 |--------|-------|
 | Backend API | http://localhost:3000 |
 | Admin Panel | http://localhost:5173 |
-| Mobile (Expo) | exp://192.168.1.10:8081 |
+| Mobile (Expo) | exp://[YEREL_IP]:8081 (veya localhost:8081) |
 
 ## Giriş Bilgileri
 
